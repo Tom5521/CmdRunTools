@@ -12,6 +12,7 @@ import (
 func TestPS1(t *testing.T) {
 	cmd := win.PSCmd("mkdir test")
 	cmd.Stdout(true)
+	cmd.HideCmdWindow(true)
 	err := cmd.Run()
 	t.Log("TTEst")
 	if err != nil {

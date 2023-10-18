@@ -7,12 +7,14 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 type WinCmd struct {
-	runWithCmd bool
-	input      string
-	path       struct {
+	runWithCmd    bool
+	hideCmdWindow bool
+	input         string
+	path          struct {
 		enabled bool
 		path    string
 	}
@@ -77,6 +79,9 @@ func (sh WinCmd) setStd(cmd *exec.Cmd) {
 func (sh WinCmd) getExec() *exec.Cmd {
 	command := strings.Fields(sh.formatcmd())
 	cmd := exec.Command(command[0], command[1:]...)
+	if sh.hideCmdWindow {
+		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
+	}
 	return cmd
 }
 
@@ -103,6 +108,10 @@ func (sh *WinCmd) RunWithCmd(set bool) {
 
 func (sh *WinCmd) SetInput(input string) {
 	sh.input = input
+}
+
+func (sh *WinCmd) HideCmdWindow(set bool) {
+	sh.hideCmdWindow = set
 }
 
 // Set custom std
