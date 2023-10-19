@@ -4,6 +4,7 @@
 package win
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -11,10 +12,17 @@ import (
 )
 
 type WinCmd struct {
-	runWithCmd    bool
-	hideCmdWindow bool
-	input         string
-	path          struct {
+	powershell struct {
+		psFlags           string
+		runWithPowershell bool
+	}
+	cmd struct {
+		cmdFlags      string
+		runWithoutCmd bool
+		hideCmdWindow bool
+	}
+	input string
+	path  struct {
 		enabled bool
 		path    string
 	}
@@ -76,19 +84,13 @@ func (sh WinCmd) setStd(cmd *exec.Cmd) {
 	}
 }
 
-func (sh WinCmd) getExec() *exec.Cmd {
-	command := strings.Fields(sh.formatcmd())
-	cmd := exec.Command(command[0], command[1:]...)
-	if sh.hideCmdWindow {
-		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
-	}
-	return cmd
-}
-
 func (sh WinCmd) formatcmd() string {
 	var cmd string
-	if sh.runWithCmd {
-		cmd = "cmd.exe /C " + sh.input
+	if sh.powershell.runWithPowershell {
+		cmd = fmt.Sprintf("powershell.exe %v /c %v", sh.powershell.psFlags, sh.input)
+	}
+	if !sh.cmd.runWithoutCmd {
+		cmd = fmt.Sprintf("cmd.exe %v /c %v", sh.cmd.cmdFlags, sh.input)
 	} else {
 		cmd = sh.input
 	}
@@ -97,13 +99,17 @@ func (sh WinCmd) formatcmd() string {
 
 // Global config parameters
 
+func (sh *WinCmd) RunWithPS(set bool) {
+	sh.powershell.runWithPowershell = set
+}
+
 func (sh *WinCmd) SetPath(path string) {
 	sh.path.enabled = true
 	sh.path.path = path
 }
 
-func (sh *WinCmd) RunWithCmd(set bool) {
-	sh.runWithCmd = set
+func (sh *WinCmd) RunWithoutCmd(set bool) {
+	sh.cmd.runWithoutCmd = set
 }
 
 func (sh *WinCmd) SetInput(input string) {
@@ -111,7 +117,15 @@ func (sh *WinCmd) SetInput(input string) {
 }
 
 func (sh *WinCmd) HideCmdWindow(set bool) {
-	sh.hideCmdWindow = set
+	sh.cmd.hideCmdWindow = set
+}
+
+func (sh *WinCmd) CustomPSFlags(flags string) {
+	sh.powershell.psFlags = flags
+}
+
+func (sh *WinCmd) CustomCmdFlags(flags string) {
+	sh.cmd.cmdFlags = flags
 }
 
 // Set custom std
@@ -133,4 +147,15 @@ func (sh *WinCmd) Stdout(set bool) {
 func (sh *WinCmd) Stderr(set bool) {
 	sh.customStd.enabled = true
 	sh.customStd.stderr = set
+}
+
+//Functions that break down the linter for quick commenting
+
+func (sh WinCmd) getExec() *exec.Cmd {
+	command := strings.Fields(sh.formatcmd())
+	cmd := exec.Command(command[0], command[1:]...)
+	if sh.cmd.hideCmdWindow {
+		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
+	}
+	return cmd
 }
