@@ -23,9 +23,18 @@
 - SetAndStart
 - SetAndCombinedOut
 - GetExec
+### Sudo Cmd
+#### Parameters
+- Same as cmd...
+- SetSudoPasswd
+#### Running modes
+- Same as cmd...
+#### Others and parameters-modes functions
+- Same as cmd...
 
 ## Windows
 #### Parameters
+- SetInput
 - RunWithPS
 - SetPath
 - RunWithoutCmd
@@ -35,6 +44,15 @@
 - Stdin
 - Stderr
 - Stdout
-
+#### Running modes
+- Run
+- Out
+- CombinedOut
+- Start
+#### Others and parameters-modes functions
+- SetAndRun
+- SetAndOut
+- SetAndCombinedOut
+- SetAndStart
 
 

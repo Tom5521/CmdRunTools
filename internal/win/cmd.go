@@ -36,28 +36,75 @@ type WinCmd struct {
 
 // Init
 
+// Initializes a new instance of the command, already setting the command to run
 func Cmd(input string) WinCmd {
 	sh := WinCmd{}
 	sh.SetInput(input)
 	return sh
 }
 
-// Running functions
+// Global config parameters
 
-func (sh WinCmd) Run() error {
-	return sh.getFinal().Run()
+// Run the command using "powershell.exe [parameters] /c [command]" instead of "cmd.exe [parameters] /c [command]"
+func (sh *WinCmd) RunWithPS(set bool) {
+	sh.powershell.runWithPowershell = set
 }
-func (sh WinCmd) Start() error {
-	return sh.getFinal().Run()
+
+// Set the running path of the command
+func (sh *WinCmd) SetPath(path string) {
+	sh.path.enabled = true
+	sh.path.path = path
 }
-func (sh WinCmd) Out() (string, error) {
-	cmd := sh.getExec()
-	out, err := cmd.Output()
-	return string(out), err
+
+// Execute the command directly, it is useful if you want to execute a binary, this mode does not have access to the path so you will have to put the full path of the binary or use something relative to execute it.
+func (sh *WinCmd) RunWithoutCmd(set bool) {
+	sh.cmd.runWithoutCmd = set
 }
-func (sh WinCmd) CombinedOut() (string, error) {
-	out, err := sh.getFinal().CombinedOutput()
-	return string(out), err
+
+// Set the command to be executed
+func (sh *WinCmd) SetInput(input string) {
+	sh.input = input
+}
+
+// Hides the cmd/powershell window that appears when executing a command in go.
+func (sh *WinCmd) HideCmdWindow(set bool) {
+	sh.cmd.hideCmdWindow = set
+}
+
+// It sets the customized powershell flags, its syntax when executed would be something like this "powershell.exe [flags] /c [command]".
+func (sh *WinCmd) CustomPSFlags(flags string) {
+	sh.powershell.psFlags = flags
+}
+
+// It sets the customized cmd flags, its syntax when executed would be something like this "cmd.exe [flags] /c [command]".
+func (sh *WinCmd) CustomCmdFlags(flags string) {
+	sh.cmd.cmdFlags = flags
+}
+
+// Set custom Stdin,Stdout,Stderr in one function
+func (sh *WinCmd) CustomStd(Stdin, Stdout, Stderr bool) {
+	sh.customStd.enabled = true
+	sh.customStd.stderr = Stderr
+	sh.customStd.stdin = Stdin
+	sh.customStd.stdout = Stdout
+}
+
+// Set the individual Stdin
+func (sh *WinCmd) Stdin(set bool) {
+	sh.customStd.enabled = true
+	sh.customStd.stdin = set
+}
+
+// Set the individual Stdout
+func (sh *WinCmd) Stdout(set bool) {
+	sh.customStd.enabled = true
+	sh.customStd.stdout = set
+}
+
+// Set the individual Stderr
+func (sh *WinCmd) Stderr(set bool) {
+	sh.customStd.enabled = true
+	sh.customStd.stderr = set
 }
 
 // Internal functions
@@ -97,58 +144,6 @@ func (sh WinCmd) formatcmd() string {
 	return cmd
 }
 
-// Global config parameters
-
-func (sh *WinCmd) RunWithPS(set bool) {
-	sh.powershell.runWithPowershell = set
-}
-
-func (sh *WinCmd) SetPath(path string) {
-	sh.path.enabled = true
-	sh.path.path = path
-}
-
-func (sh *WinCmd) RunWithoutCmd(set bool) {
-	sh.cmd.runWithoutCmd = set
-}
-
-func (sh *WinCmd) SetInput(input string) {
-	sh.input = input
-}
-
-func (sh *WinCmd) HideCmdWindow(set bool) {
-	sh.cmd.hideCmdWindow = set
-}
-
-func (sh *WinCmd) CustomPSFlags(flags string) {
-	sh.powershell.psFlags = flags
-}
-
-func (sh *WinCmd) CustomCmdFlags(flags string) {
-	sh.cmd.cmdFlags = flags
-}
-
-// Set custom std
-func (sh *WinCmd) CustomStd(Stdin, Stdout, Stderr bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stderr = Stderr
-	sh.customStd.stdin = Stdin
-	sh.customStd.stdout = Stdout
-}
-
-func (sh *WinCmd) Stdin(set bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stdin = set
-}
-func (sh *WinCmd) Stdout(set bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stdout = set
-}
-func (sh *WinCmd) Stderr(set bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stderr = set
-}
-
 //Functions that break down the linter for quick commenting
 
 func (sh WinCmd) getExec() *exec.Cmd {
@@ -158,4 +153,55 @@ func (sh WinCmd) getExec() *exec.Cmd {
 		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
 	}
 	return cmd
+}
+
+// Set and ... functions
+
+// It is the same as cmd := command.Cmd("<command>"); cmd.Run() but in a single argument, what it does is to put an internal input (the one provided) and execute it directly without affecting the main structure.
+func (sh WinCmd) SetAndRun(command string) error {
+	sh.SetInput(command)
+	return sh.Run()
+}
+
+// It is the same as cmd := command.Cmd("<command>"); cmd.Out() but in a single argument, what it does is to put an internal input (the one provided) and execute it directly without affecting the main structure.
+func (sh WinCmd) SetAndOut(command string) (string, error) {
+	sh.SetInput(command)
+	return sh.Out()
+}
+
+// It is the same as cmd := command.Cmd("<command>"); cmd.Start() but in a single argument, what it does is to put an internal input (the one provided) and execute it directly without affecting the main structure.
+func (sh WinCmd) SetAndStart(command string) error {
+	sh.SetInput(command)
+	return sh.Start()
+}
+
+// It is the same as cmd := command.Cmd("<command>"); cmd.CombinedOut() but in a single argument, what it does is to put an internal input (the one provided) and execute it directly without affecting the main structure.
+func (sh WinCmd) SetAndCombinedOut(command string) (string, error) {
+	sh.SetInput(command)
+	return sh.CombinedOut()
+}
+
+// Running functions
+
+// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Run()" and return its error output
+func (sh WinCmd) Run() error {
+	return sh.getFinal().Run()
+}
+
+// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Start()" and return its error output
+func (sh WinCmd) Start() error {
+	return sh.getFinal().Run()
+}
+
+// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Output()" and return its string and error output
+func (sh WinCmd) Out() (string, error) {
+	cmd := sh.getExec()
+	out, err := cmd.Output()
+	return string(out), err
+}
+
+// Execute the command with all parameters already set, something like "exec.Command([formatted command]).CombinedOutput()" and return its error and string output, as well as executing with output to stdin,stdout and stderr.
+func (sh WinCmd) CombinedOut() (string, error) {
+	out, err := sh.getFinal().CombinedOutput()
+	return string(out), err
 }
