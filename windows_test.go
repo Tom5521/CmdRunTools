@@ -3,7 +3,7 @@ package cmd_test
 import (
 	"testing"
 
-	win "github.com/Tom5521/CmdRunTools/internal/windows"
+	"github.com/Tom5521/CmdRunTools/internal/win"
 )
 
 func Test_PS(t *testing.T) {
