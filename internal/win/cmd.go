@@ -205,3 +205,7 @@ func (sh WinCmd) CombinedOut() (string, error) {
 	out, err := sh.getFinal().CombinedOutput()
 	return string(out), err
 }
+
+func GetStruct() *WinCmd {
+	return &WinCmd{}
+}

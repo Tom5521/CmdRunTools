@@ -7,6 +7,14 @@ import (
 	"github.com/Tom5521/CmdRunTools/internal/unix"
 )
 
+func GetStruct() *unix.UnixCmd {
+	return unix.GetStruct()
+}
+
+func GetSudoStruct() *unix.UnixSudoCmd {
+	return unix.GetSudoStruct()
+}
+
 func Cmd(command string) *unix.UnixCmd {
 	ret := unix.Cmd(command)
 	return &ret

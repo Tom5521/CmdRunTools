@@ -31,6 +31,9 @@
 - Same as cmd...
 #### Others and parameters-modes functions
 - Same as cmd...
+#### Whitout Structure
+- GetStruct
+- GetSudoStruct
 
 ## Windows
 #### Parameters
@@ -54,5 +57,6 @@
 - SetAndOut
 - SetAndCombinedOut
 - SetAndStart
-
+#### Whitout Structure
+- GetStruct
 

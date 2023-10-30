@@ -184,3 +184,10 @@ func (sh UnixCmd) GetExec() *exec.Cmd {
 	sh.setStd(cmd)
 	return cmd
 }
+
+func GetStruct() *UnixCmd {
+	return &UnixCmd{}
+}
+func GetSudoStruct() *UnixSudoCmd {
+	return &UnixSudoCmd{}
+}

@@ -54,3 +54,7 @@ func Test_SetAnd(t *testing.T) {
 	}
 	cmd.SetAndRun("rmdir test")
 }
+
+func Test_Unix_Struct(t *testing.T) {
+	t.Log(unix.GetStruct())
+}

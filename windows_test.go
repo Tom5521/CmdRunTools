@@ -11,3 +11,7 @@ func Test_PS(t *testing.T) {
 	cmd.RunWithPS(true)
 	cmd.Run()
 }
+
+func Test_Struct(t *testing.T) {
+	t.Log(win.GetStruct())
+}
