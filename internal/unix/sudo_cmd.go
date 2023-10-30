@@ -22,7 +22,7 @@ type UnixSudoCmd struct {
 func Sudo_Cmd(command string, optional_password ...string) UnixSudoCmd {
 	sudoSh := UnixSudoCmd{}
 	sudoSh.input = command
-	if len(optional_password) >= 1 {
+	if len(optional_password) > 0 {
 		sudoSh.SetSudoPasswd(optional_password[0])
 	}
 	return sudoSh
