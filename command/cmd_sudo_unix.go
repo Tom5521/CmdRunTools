@@ -1,7 +1,7 @@
 //go:build unix
 // +build unix
 
-package unix
+package command
 
 import (
 	"fmt"
