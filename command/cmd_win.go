@@ -206,6 +206,9 @@ func (sh Cmd) CombinedOut() (string, error) {
 	return string(out), err
 }
 
-func GetStruct() *Cmd {
-	return &Cmd{}
+// Returns the exec.Cmd structure with all parameters already configured
+func (sh Cmd) GetExec() *exec.Cmd {
+	cmd := sh.getExec()
+	sh.setStd(cmd)
+	return cmd
 }
