@@ -135,8 +135,7 @@ func (sh Cmd) formatcmd() string {
 	var cmd string
 	if sh.powershell.runWithPowershell {
 		cmd = fmt.Sprintf("powershell.exe %v /c %v", sh.powershell.psFlags, sh.input)
-	}
-	if !sh.cmd.runWithoutCmd {
+	} else if !sh.cmd.runWithoutCmd {
 		cmd = fmt.Sprintf("cmd.exe %v /c %v", sh.cmd.cmdFlags, sh.input)
 	} else {
 		cmd = sh.input

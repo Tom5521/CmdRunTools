@@ -11,6 +11,11 @@ import (
 
 func Test_PS(t *testing.T) {
 	cmd := command.InitCmd("ls")
-	cmd.RunWithPS(true)
-	cmd.Run()
+	cmd.RunWithPS(false)
+	err := cmd.Run()
+	if err != nil {
+		t.Log(cmd.GetExec())
+		t.Log(err.Error())
+		t.Fail()
+	}
 }
