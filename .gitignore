@@ -1,2 +1,4 @@
 *.test
 *.test.exe
+Testconf.json
+*.log

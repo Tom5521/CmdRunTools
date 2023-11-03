@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-type UnixSudoCmd struct {
-	UnixCmd
+type SudoCmd struct {
+	Cmd
 	sudo_pars struct {
 		getted bool
 		Passwd string
@@ -19,8 +19,8 @@ type UnixSudoCmd struct {
 }
 
 // Runs a command as sudo
-func Sudo_Cmd(command string, optional_password ...string) UnixSudoCmd {
-	sudoSh := UnixSudoCmd{}
+func Sudo_Cmd(command string, optional_password ...string) SudoCmd {
+	sudoSh := SudoCmd{}
 	sudoSh.input = command
 	if len(optional_password) > 0 {
 		sudoSh.SetSudoPasswd(optional_password[0])
@@ -29,13 +29,13 @@ func Sudo_Cmd(command string, optional_password ...string) UnixSudoCmd {
 }
 
 // Sudo parameters
-func (sh *UnixSudoCmd) SetSudoPasswd(password string) {
+func (sh *SudoCmd) SetSudoPasswd(password string) {
 	sh.sudo_pars.getted = true
 	sh.sudo_pars.Passwd = password
 }
 
 // Internal sudo functions
-func (sh UnixSudoCmd) getExec() *exec.Cmd {
+func (sh SudoCmd) getExec() *exec.Cmd {
 	var cmd *exec.Cmd
 	if sh.runWithShell.Enabled {
 		if sh.runWithShell.bash {
@@ -54,7 +54,7 @@ func (sh UnixSudoCmd) getExec() *exec.Cmd {
 	return cmd
 }
 
-func (sh UnixSudoCmd) writePasswd(cmd *exec.Cmd) {
+func (sh SudoCmd) writePasswd(cmd *exec.Cmd) {
 	stdin, _ := cmd.StdinPipe()
 	go func() {
 		defer stdin.Close()
@@ -64,20 +64,20 @@ func (sh UnixSudoCmd) writePasswd(cmd *exec.Cmd) {
 
 // sudo running funcions
 
-func (sh UnixSudoCmd) Run() error {
+func (sh SudoCmd) Run() error {
 	cmd := sh.getExec()
 	sh.setStd(cmd)
 	sh.writePasswd(cmd)
 	return cmd.Run()
 }
-func (sh UnixSudoCmd) Out() (string, error) {
+func (sh SudoCmd) Out() (string, error) {
 	cmd := sh.getExec()
 	sh.writePasswd(cmd)
 	out, err := cmd.Output()
 	return string(out), err
 }
 
-func (sh UnixSudoCmd) CombinedOut() (string, error) {
+func (sh SudoCmd) CombinedOut() (string, error) {
 	cmd := sh.getExec()
 	sh.setStd(cmd)
 	sh.writePasswd(cmd)
@@ -85,7 +85,7 @@ func (sh UnixSudoCmd) CombinedOut() (string, error) {
 	return string(out), err
 }
 
-func (sh UnixSudoCmd) Start() error {
+func (sh SudoCmd) Start() error {
 	cmd := sh.getExec()
 	sh.setStd(cmd)
 	sh.writePasswd(cmd)

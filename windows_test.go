@@ -1,4 +1,7 @@
-package cmd_test
+//go:build windows
+// +build windows
+
+package command
 
 import (
 	"testing"
@@ -7,7 +10,7 @@ import (
 )
 
 func Test_PS(t *testing.T) {
-	cmd := command.Cmd("ls")
+	cmd := command.InitCmd("ls")
 	cmd.RunWithPS(true)
 	cmd.Run()
 }
