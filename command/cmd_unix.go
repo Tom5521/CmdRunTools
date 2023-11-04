@@ -11,22 +11,23 @@ import (
 
 // global struct
 type Cmd struct {
-	input string
-	path  struct {
-		Enabled bool
-		Path    string
+	Input     string
+	Path      string
+	path_conf struct {
+		enabled bool
+		path    string
 	}
-	runWithShell struct {
-		Enabled  bool
+	Shell struct {
+		enabled  bool
 		bash     bool // Default linux shell is sh
-		customSh struct {
-			Enable bool
+		CustomSh struct {
+			enable bool
 			ShName string
 			ShArg  string // Shell execution cmd
 		}
 	}
-	customStd struct {
-		Enable bool
+	CStd struct {
+		enable bool
 		Stdin  bool
 		Stdout bool
 		Stderr bool
@@ -37,62 +38,63 @@ type Cmd struct {
 
 // Runs a normal command (without sudo)
 func InitCmd(Command string) Cmd {
-	sh := Cmd{input: Command}
+	sh := Cmd{Input: Command}
 	return sh
 }
 
 // General parameter funcions
 func (sh *Cmd) SetInput(input string) {
-	sh.input = input
+	sh.Input = input
 }
 func (sh *Cmd) SetPath(path string) {
-	sh.path.Enabled = true
-	sh.path.Path = path
+	sh.path_conf.enabled = true
+	sh.path_conf.path = path
+	sh.Path = path
 }
 
 // If the value is true use exec.Command([shell],[arg],input) instead of exec.Command(input[0],input[1:]...)
 func (sh *Cmd) RunWithShell(set bool) {
-	sh.runWithShell.Enabled = set
+	sh.Shell.enabled = set
 }
 
 // Set a custom stdin,stdout or stderr. Default std is all in false
 func (sh *Cmd) CustomStd(Stdin, Stdout, Stderr bool) {
-	sh.customStd.Enable = true
-	sh.customStd.Stderr = Stderr
-	sh.customStd.Stdout = Stdout
-	sh.customStd.Stdin = Stdin
+	sh.CStd.enable = true
+	sh.CStd.Stderr = Stderr
+	sh.CStd.Stdout = Stdout
+	sh.CStd.Stdin = Stdin
 }
 func (sh *Cmd) Stdin(set bool) {
-	sh.customStd.Enable = true
-	sh.customStd.Stdin = set
+	sh.CStd.enable = true
+	sh.CStd.Stdin = set
 }
 func (sh *Cmd) Stderr(set bool) {
-	sh.customStd.Enable = true
-	sh.customStd.Stderr = set
+	sh.CStd.enable = true
+	sh.CStd.Stderr = set
 }
 func (sh *Cmd) Stdout(set bool) {
-	sh.customStd.Enable = true
-	sh.customStd.Stdout = set
+	sh.CStd.enable = true
+	sh.CStd.Stdout = set
 }
 
 // Set a custom shell to exec the command
 func (sh *Cmd) CustomShell(Shell_Name, Exec_Arg string) {
 	sh.RunWithShell(true)
-	sh.runWithShell.customSh.Enable = true
-	sh.runWithShell.customSh.ShArg = Exec_Arg
-	sh.runWithShell.customSh.ShName = Shell_Name
+	sh.Shell.CustomSh.enable = true
+	sh.Shell.CustomSh.ShArg = Exec_Arg
+	sh.Shell.CustomSh.ShName = Shell_Name
 }
 
 func (sh *Cmd) UseBashShell(set bool) {
 	sh.RunWithShell(true)
-	sh.runWithShell.bash = true
+	sh.Shell.bash = true
 }
 
 // Internal funcions
 
 func (sh Cmd) setStd(cmd *exec.Cmd) {
-	if sh.customStd.Enable {
-		std := sh.customStd
+	if sh.CStd.enable {
+		std := sh.CStd
 		if std.Stderr {
 			cmd.Stderr = os.Stderr
 		}
@@ -106,16 +108,16 @@ func (sh Cmd) setStd(cmd *exec.Cmd) {
 }
 func (sh Cmd) getExec() *exec.Cmd {
 	var cmd *exec.Cmd
-	if sh.runWithShell.Enabled {
-		if sh.runWithShell.bash {
-			cmd = exec.Command("bash", "-c", sh.input)
+	if sh.Shell.enabled {
+		if sh.Shell.bash {
+			cmd = exec.Command("bash", "-c", sh.Input)
 		}
-		if sh.runWithShell.customSh.Enable {
-			cshell := sh.runWithShell.customSh
-			cmd = exec.Command(cshell.ShName, cshell.ShArg, sh.input)
+		if sh.Shell.CustomSh.enable {
+			cshell := sh.Shell.CustomSh
+			cmd = exec.Command(cshell.ShName, cshell.ShArg, sh.Input)
 		}
 	} else {
-		command := strings.Fields(sh.input)
+		command := strings.Fields(sh.Input)
 		cmd = exec.Command(command[0], command[1:]...)
 	}
 	return cmd

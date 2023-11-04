@@ -12,25 +12,26 @@ import (
 )
 
 type Cmd struct {
-	powershell struct {
-		psFlags           string
+	Powershell struct {
+		PSFlags           string
 		runWithPowershell bool
 	}
 	cmd struct {
-		cmdFlags      string
-		runWithoutCmd bool
-		hideCmdWindow bool
+		CmdFlags      string
+		RunWithoutCmd bool
+		HideCmdWindow bool
 	}
-	input string
+	Input string
+	Path  string
 	path  struct {
 		enabled bool
 		path    string
 	}
-	customStd struct {
+	CStd struct {
 		enabled bool
-		stdin   bool
-		stderr  bool
-		stdout  bool
+		Stdin   bool
+		Stderr  bool
+		Stdout  bool
 	}
 }
 
@@ -47,64 +48,65 @@ func InitCmd(input string) Cmd {
 
 // Run the command using "powershell.exe [parameters] /c [command]" instead of "cmd.exe [parameters] /c [command]"
 func (sh *Cmd) RunWithPS(set bool) {
-	sh.powershell.runWithPowershell = set
+	sh.Powershell.runWithPowershell = set
 }
 
 // Set the running path of the command
 func (sh *Cmd) SetPath(path string) {
 	sh.path.enabled = true
 	sh.path.path = path
+	sh.Path = path
 }
 
 // Execute the command directly, it is useful if you want to execute a binary, this mode does not have access to the path so you will have to put the full path of the binary or use something relative to execute it.
 func (sh *Cmd) RunWithoutCmd(set bool) {
-	sh.cmd.runWithoutCmd = set
+	sh.cmd.RunWithoutCmd = set
 }
 
 // Set the command to be executed
 func (sh *Cmd) SetInput(input string) {
-	sh.input = input
+	sh.Input = input
 }
 
 // Hides the cmd/powershell window that appears when executing a command in go.
 func (sh *Cmd) HideCmdWindow(set bool) {
-	sh.cmd.hideCmdWindow = set
+	sh.cmd.HideCmdWindow = set
 }
 
 // It sets the customized powershell flags, its syntax when executed would be something like this "powershell.exe [flags] /c [command]".
 func (sh *Cmd) CustomPSFlags(flags string) {
-	sh.powershell.psFlags = flags
+	sh.Powershell.PSFlags = flags
 }
 
 // It sets the customized cmd flags, its syntax when executed would be something like this "cmd.exe [flags] /c [command]".
 func (sh *Cmd) CustomCmdFlags(flags string) {
-	sh.cmd.cmdFlags = flags
+	sh.cmd.CmdFlags = flags
 }
 
 // Set custom Stdin,Stdout,Stderr in one function
 func (sh *Cmd) CustomStd(Stdin, Stdout, Stderr bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stderr = Stderr
-	sh.customStd.stdin = Stdin
-	sh.customStd.stdout = Stdout
+	sh.CStd.enabled = true
+	sh.CStd.Stderr = Stderr
+	sh.CStd.Stdin = Stdin
+	sh.CStd.Stdout = Stdout
 }
 
 // Set the individual Stdin
 func (sh *Cmd) Stdin(set bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stdin = set
+	sh.CStd.enabled = true
+	sh.CStd.Stdin = set
 }
 
 // Set the individual Stdout
 func (sh *Cmd) Stdout(set bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stdout = set
+	sh.CStd.enabled = true
+	sh.CStd.Stdout = set
 }
 
 // Set the individual Stderr
 func (sh *Cmd) Stderr(set bool) {
-	sh.customStd.enabled = true
-	sh.customStd.stderr = set
+	sh.CStd.enabled = true
+	sh.CStd.Stderr = set
 }
 
 // Internal functions
@@ -116,29 +118,29 @@ func (sh Cmd) getFinal() *exec.Cmd {
 }
 
 func (sh Cmd) setStd(cmd *exec.Cmd) {
-	if !sh.customStd.enabled {
+	if !sh.CStd.enabled {
 		return
 	}
-	cStd := sh.customStd
-	if cStd.stdin {
+	cStd := sh.CStd
+	if cStd.Stdin {
 		cmd.Stdin = os.Stdin
 	}
-	if cStd.stdout {
+	if cStd.Stdout {
 		cmd.Stdout = os.Stdout
 	}
-	if cStd.stderr {
+	if cStd.Stderr {
 		cmd.Stderr = os.Stderr
 	}
 }
 
 func (sh Cmd) formatcmd() string {
 	var cmd string
-	if sh.powershell.runWithPowershell {
-		cmd = fmt.Sprintf("powershell.exe %v /c %v", sh.powershell.psFlags, sh.input)
-	} else if !sh.cmd.runWithoutCmd {
-		cmd = fmt.Sprintf("cmd.exe %v /c %v", sh.cmd.cmdFlags, sh.input)
+	if sh.Powershell.runWithPowershell {
+		cmd = fmt.Sprintf("powershell.exe %v /c %v", sh.Powershell.PSFlags, sh.Input)
+	} else if !sh.cmd.RunWithoutCmd {
+		cmd = fmt.Sprintf("cmd.exe %v /c %v", sh.cmd.CmdFlags, sh.Input)
 	} else {
-		cmd = sh.input
+		cmd = sh.Input
 	}
 	return cmd
 }
@@ -148,7 +150,7 @@ func (sh Cmd) formatcmd() string {
 func (sh Cmd) getExec() *exec.Cmd {
 	command := strings.Fields(sh.formatcmd())
 	cmd := exec.Command(command[0], command[1:]...)
-	if sh.cmd.hideCmdWindow {
+	if sh.cmd.HideCmdWindow {
 		cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000}
 	}
 	return cmd

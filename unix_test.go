@@ -5,6 +5,7 @@ package command
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
 
@@ -17,9 +18,9 @@ type jsondata struct {
 	Passwd string `json:"password"`
 }
 
-func WriteLog(toAdd string) {
-	file, _ := os.Create("out.log")
-	file.WriteString(toAdd)
+func WriteLog(data ...any) {
+	Strdata := fmt.Sprint(data...)
+	os.WriteFile("out.log", []byte(Strdata), os.ModePerm)
 }
 
 func getTestConf() jsondata {
@@ -43,7 +44,7 @@ func Test_Sudo(t *testing.T) {
 		cmd := command.InitCmd("ls /")
 		out, _ := cmd.Out()
 		t.Log(out)
-		LogOut += "\n" + out
+		LogOut = fmt.Sprintf("%v\n%v", LogOut, out)
 	}
 	file := "/asdadass"
 	cmd := command.Sudo_Cmd("mkdir "+file, conf.Passwd)
@@ -71,7 +72,8 @@ func Test_CmdLib(t *testing.T) {
 		t.Fail()
 	}
 	//cmd.Stdout(true)
-	_, err = cmd.SetAndCombinedOut("ls")
+	out, err = cmd.SetAndCombinedOut("ls")
+	WriteLog(out)
 	if err != nil {
 		t.Log(err.Error())
 		t.Fail()
@@ -80,11 +82,13 @@ func Test_CmdLib(t *testing.T) {
 
 func Test_SetAnd(t *testing.T) {
 	cmd := command.Cmd{}
-	out, err := cmd.SetAndOut("mkdir test")
+	_, err := cmd.SetAndOut("mkdir test")
+	out, err := cmd.SetAndCombinedOut("ls")
+	WriteLog(out)
+
 	if _, err := os.Stat("test"); os.IsNotExist(err) {
 		t.Fail()
 	}
-	t.Log(out, err)
 	if err != nil {
 		t.Fail()
 	}

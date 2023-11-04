@@ -21,7 +21,7 @@ type SudoCmd struct {
 // Runs a command as sudo
 func Sudo_Cmd(command string, optional_password ...string) SudoCmd {
 	sudoSh := SudoCmd{}
-	sudoSh.input = command
+	sudoSh.Input = command
 	if len(optional_password) > 0 {
 		sudoSh.SetSudoPasswd(optional_password[0])
 	}
@@ -37,18 +37,18 @@ func (sh *SudoCmd) SetSudoPasswd(password string) {
 // Internal sudo functions
 func (sh SudoCmd) getExec() *exec.Cmd {
 	var cmd *exec.Cmd
-	if sh.runWithShell.Enabled {
-		if sh.runWithShell.bash {
-			command := strings.Fields(fmt.Sprintf("bash -c \"sudo -S %v\"", sh.input))
+	if sh.Shell.enabled {
+		if sh.Shell.bash {
+			command := strings.Fields(fmt.Sprintf("bash -c \"sudo -S %v\"", sh.Input))
 			cmd = exec.Command(command[0], command[1:]...)
 		}
-		if sh.runWithShell.customSh.Enable {
-			cshell := sh.runWithShell.customSh
-			command := strings.Fields(fmt.Sprintf("sudo -S %v %v %v", cshell.ShName, cshell.ShArg, sh.input))
+		if sh.Shell.CustomSh.enable {
+			cshell := sh.Shell.CustomSh
+			command := strings.Fields(fmt.Sprintf("sudo -S %v %v %v", cshell.ShName, cshell.ShArg, sh.Input))
 			cmd = exec.Command(command[0], command[1:]...)
 		}
 	} else {
-		command := strings.Fields("sudo -S " + sh.input)
+		command := strings.Fields("sudo -S " + sh.Input)
 		cmd = exec.Command(command[0], command[1:]...)
 	}
 	return cmd

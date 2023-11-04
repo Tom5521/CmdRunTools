@@ -27,3 +27,21 @@ func Test_PS(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func Test_Cmd(t *testing.T) {
+	cmd := command.InitCmd("dir")
+	out, err := cmd.CombinedOut()
+	WriteToLog(out)
+	if err != nil {
+		WriteToLog(err.Error(), out)
+		t.Fail()
+	}
+	cmd.SetInput("ls")
+	cmd.RunWithPS(true)
+	//cmd.RunWithoutCmd(true)
+	err = cmd.Run()
+	if err != nil {
+		WriteToLog(err.Error())
+		t.Fail()
+	}
+}
