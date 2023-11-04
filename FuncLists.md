@@ -12,6 +12,7 @@
 - Stdin
 - Stdout
 - Stderr
+- Chroot
 #### Running modes
 - Run 
 - Out

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 )
 
 // global struct
@@ -25,6 +26,10 @@ type Cmd struct {
 			ShName string
 			ShArg  string // Shell execution cmd
 		}
+	}
+	Chroot struct {
+		Route   string
+		enabled bool
 	}
 	CStd struct {
 		enable bool
@@ -90,6 +95,11 @@ func (sh *Cmd) UseBashShell(set bool) {
 	sh.Shell.bash = true
 }
 
+func (sh *Cmd) SetChroot(mountPoint string) {
+	sh.Chroot.enabled = true
+	sh.Chroot.Route = mountPoint
+}
+
 // Internal funcions
 
 func (sh Cmd) setStd(cmd *exec.Cmd) {
@@ -108,6 +118,21 @@ func (sh Cmd) setStd(cmd *exec.Cmd) {
 }
 func (sh Cmd) getExec() *exec.Cmd {
 	var cmd *exec.Cmd
+
+	if sh.Chroot.enabled {
+		if sh.Shell.CustomSh.enable {
+			csh := sh.Shell.CustomSh
+			cmd = exec.Command("bash", "-c", csh.ShName, csh.ShArg, sh.Input)
+		} else {
+			cmd = exec.Command("bash", "-c", sh.Input)
+		}
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Chroot: sh.Chroot.Route,
+		}
+		return cmd
+
+	}
+
 	if sh.Shell.enabled {
 		if sh.Shell.bash {
 			cmd = exec.Command("bash", "-c", sh.Input)
@@ -120,6 +145,7 @@ func (sh Cmd) getExec() *exec.Cmd {
 		command := strings.Fields(sh.Input)
 		cmd = exec.Command(command[0], command[1:]...)
 	}
+
 	return cmd
 }
 

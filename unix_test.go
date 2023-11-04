@@ -15,7 +15,9 @@ import (
 var conf = getTestConf()
 
 type jsondata struct {
-	Passwd string `json:"password"`
+	Passwd        string `json:"password"`
+	ChrootDir     string `json:"chroot-dir"`
+	ChrootCommand string `json:"chroot-command"`
 }
 
 func WriteLog(data ...any) {
@@ -24,7 +26,7 @@ func WriteLog(data ...any) {
 }
 
 func getTestConf() jsondata {
-	data := jsondata{Passwd: ""}
+	data := jsondata{}
 	var confFile = "Testconf.json"
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
 		file, _ := os.Create(confFile)
@@ -97,4 +99,25 @@ func Test_SetAnd(t *testing.T) {
 		t.Fail()
 	}
 	cmd.SetAndRun("rmdir test")
+}
+
+// I test this in a virtual machine
+func Test_Chroot(t *testing.T) {
+	cmd := command.InitCmd(conf.ChrootCommand)
+	cmd.SetChroot(conf.ChrootDir)
+	t.Log(cmd.Chroot)
+	t.Log(cmd.GetExec())
+	//cmd.CustomStd(true, true, true)
+	out, err := cmd.Out()
+	WriteLog(out)
+	if err != nil {
+		t.Log(err.Error())
+		outLog, _ := os.ReadFile("out.log")
+		t.Log(string(outLog))
+		t.Fail()
+		return
+	}
+	outLog, _ := os.ReadFile("out.log")
+	t.Log(string(outLog))
+
 }
