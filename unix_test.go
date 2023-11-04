@@ -24,7 +24,7 @@ func WriteLog(data ...any) {
 }
 
 func getTestConf() jsondata {
-	data := jsondata{Passwd: "-"}
+	data := jsondata{Passwd: ""}
 	var confFile = "Testconf.json"
 	if _, err := os.Stat(confFile); os.IsNotExist(err) {
 		file, _ := os.Create(confFile)
@@ -37,6 +37,10 @@ func getTestConf() jsondata {
 }
 
 func Test_Sudo(t *testing.T) {
+	if conf.Passwd == "" {
+		t.Log("Passwd is <nil>")
+		t.Fatal()
+	}
 	var LogOut string
 	defer WriteLog(LogOut)
 	t.Log(conf.Passwd)
