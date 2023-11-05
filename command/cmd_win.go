@@ -13,8 +13,8 @@ import (
 
 type Cmd struct {
 	Powershell struct {
-		PSFlags           string
-		runWithPowershell bool
+		PSFlags string
+		enabled bool
 	}
 	cmd struct {
 		CmdFlags      string
@@ -48,7 +48,7 @@ func InitCmd(input string) Cmd {
 
 // Run the command using "powershell.exe [parameters] /c [command]" instead of "cmd.exe [parameters] /c [command]"
 func (sh *Cmd) RunWithPS(set bool) {
-	sh.Powershell.runWithPowershell = set
+	sh.Powershell.enabled = set
 }
 
 // Set the running path of the command
@@ -135,7 +135,7 @@ func (sh Cmd) setStd(cmd *exec.Cmd) {
 
 func (sh Cmd) formatcmd() string {
 	var cmd string
-	if sh.Powershell.runWithPowershell {
+	if sh.Powershell.enabled {
 		cmd = fmt.Sprintf("powershell.exe %v /c %v", sh.Powershell.PSFlags, sh.Input)
 	} else if !sh.cmd.RunWithoutCmd {
 		cmd = fmt.Sprintf("cmd.exe %v /c %v", sh.cmd.CmdFlags, sh.Input)
