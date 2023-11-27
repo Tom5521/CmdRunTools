@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/Tom5521/CmdRunTools/command"
+	"github.com/stretchr/testify/assert"
 )
 
 func WriteToLog(data ...any) {
@@ -44,4 +45,14 @@ func Test_Cmd(t *testing.T) {
 		WriteToLog(err.Error())
 		t.Fail()
 	}
+}
+
+func Test_ChangeInput(t *testing.T) {
+	assert := assert.New(t)
+	cmd := command.InitCmd("dir")
+	original := cmd.Input
+	fmt.Println(cmd.Input)
+	cmd.SetInput("Hola mundo")
+	n := cmd.Input
+	assert.NotEqual(n, original)
 }

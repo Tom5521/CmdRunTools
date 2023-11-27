@@ -119,5 +119,10 @@ func Test_Chroot(t *testing.T) {
 	}
 	outLog, _ := os.ReadFile("out.log")
 	t.Log(string(outLog))
+}
 
+func Test_SetCstd(t *testing.T) {
+	cmd := command.InitCmd("ls")
+	cmd.CustomStd(true, true, true)
+	cmd.Run()
 }

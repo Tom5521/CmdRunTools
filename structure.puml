@@ -1,0 +1,96 @@
+@startuml
+namespace command {
+    class Cmd << (S,Aquamarine) >> {
+        + Shell <font color=blue>struct</font>{bool, bool, <font color=blue>struct</font>{bool, string, string}}
+        + Chroot <font color=blue>struct</font>{string, bool}
+        + Powershell <font color=blue>struct</font>{string, bool}
+        + Cmd <font color=blue>struct</font>{string, bool, bool}
+
+        - getExec() *exec.Cmd
+        - getFinal() *exec.Cmd
+        - formatcmd() string
+        - getExec() *exec.Cmd
+
+        + SetChroot(mountPoint string) 
+        + SetChrootf(mountPoint string, args ...any) 
+        + CustomPSFlags(flags string) 
+        + CustomPSFlagsf(flags string, args ...any) 
+        + CustomCmdFlags(flags string) 
+        + CustomCmdFlagsf(flags string, args ...any) 
+        + RunWithShell(set bool) 
+        + CustomStd(Stdin bool, Stdout bool, Stderr bool) 
+        + Stdin(set bool) 
+        + Stderr(set bool) 
+        + Stdout(set bool) 
+        + CustomShell(Shell_Name string, Exec_Arg string) 
+        + UseBashShell(set bool) 
+        + Run() error
+        + Out() (string, error)
+        + CombinedOut() (string, error)
+        + Start() error
+        + GetExec() *exec.Cmd
+        + RunWithPS(set bool) 
+        + RunWithoutCmd(set bool) 
+        + HideCmdWindow(set bool) 
+        + CustomStd(Stdin bool, Stdout bool, Stderr bool) 
+        + Stdin(set bool) 
+        + Stdout(set bool) 
+        + Stderr(set bool) 
+        + Run() error
+        + Start() error
+        + Out() (string, error)
+        + CombinedOut() (string, error)
+        + GetExec() *exec.Cmd
+        + SetAndRun(command string) error
+        + SetAndOut(command string) (string, error)
+        + SetAndCombinedOut(command string) (string, error)
+        + SetAndStart(command string) error
+        + SetAndRunf(command string, args ...any) error
+        + SetAndOutf(command string, args ...any) (string, error)
+        + SetAndCombinedOutf(command string, args ...any) (string, error)
+        + SetAndStartf(command string, args ...any) error
+        + SetAndRun(command string) error
+        + SetAndRunf(command string, args ...any) error
+        + SetAndOut(command string) (string, error)
+        + SetAndOutf(command string, args ...any) (string, error)
+        + SetAndStart(command string) error
+        + SetAndStartf(command string, args ...any) error
+        + SetAndCombinedOut(command string) (string, error)
+        + SetAndCombinedOutf(command string, args ...any) (string, error)
+
+    }
+    class SudoCmd << (S,Aquamarine) >> {
+        - sudo_pars <font color=blue>struct</font>{bool, string}
+
+        - getExec() *exec.Cmd
+        - writePasswd(cmd *exec.Cmd) 
+
+        + SetSudoPasswd(password string) 
+        + Run() error
+        + Out() (string, error)
+        + CombinedOut() (string, error)
+        + Start() error
+
+    }
+}
+"internal.Shared" *-- "command.Cmd"
+"command.Cmd" *-- "command.SudoCmd"
+
+
+namespace internal {
+    class Shared << (S,Aquamarine) >> {
+        + Input string
+        + Path string
+        + PathConf <font color=blue>struct</font>{bool, string}
+        + CStd <font color=blue>struct</font>{bool, bool, bool, bool}
+
+        + SetInput(input string) 
+        + SetInputf(input string, args ...any) 
+        + SetPath(path string) 
+        + SetPathf(path string, args ...any) 
+
+    }
+}
+
+
+@enduml
