@@ -12,7 +12,7 @@ import (
 	"github.com/Tom5521/CmdRunTools/internal"
 )
 
-// global struct
+// global struct.
 type Cmd struct {
 	internal.Shared
 	Shell struct {
@@ -32,16 +32,16 @@ type Cmd struct {
 
 // Init functions
 
-// Creates a Cmd structure
-func InitCmd(Command string) Cmd {
+// Creates a Cmd structure.
+func InitCmd(command string) Cmd {
 	sh := Cmd{}
-	sh.Input = Command
+	sh.Input = command
 	return sh
 }
 
-// It's the same as InitCmd(fmt.Sprintf(command,args...))
-func InitCmdf(Command string, args ...any) Cmd {
-	return InitCmd(fmt.Sprintf(Command, args...))
+// It's the same as InitCmd(fmt.Sprintf(command,args...)).
+func InitCmdf(command string, args ...any) Cmd {
+	return InitCmd(fmt.Sprintf(command, args...))
 }
 
 // If the value is true use exec.Command([shell],[arg],input) instead of exec.Command(input[0],input[1:]...)
@@ -49,12 +49,12 @@ func (sh *Cmd) RunWithShell(set bool) {
 	sh.Shell.Enabled = set
 }
 
-// Set a custom stdin,stdout or stderr. Default std is all in false
-func (sh *Cmd) CustomStd(Stdin, Stdout, Stderr bool) {
+// Set a custom stdin,stdout or stderr. Default std is all in false.
+func (sh *Cmd) CustomStd(stdin, stdout, stderr bool) {
 	sh.CStd.Enabled = true
-	sh.CStd.Stderr = Stderr
-	sh.CStd.Stdout = Stdout
-	sh.CStd.Stdin = Stdin
+	sh.CStd.Stderr = stderr
+	sh.CStd.Stdout = stdout
+	sh.CStd.Stdin = stdin
 }
 func (sh *Cmd) Stdin(set bool) {
 	sh.CStd.Enabled = true
@@ -69,17 +69,17 @@ func (sh *Cmd) Stdout(set bool) {
 	sh.CStd.Stdout = set
 }
 
-// Set a custom shell to exec the command
-func (sh *Cmd) CustomShell(Shell_Name, Exec_Arg string) {
+// Set a custom shell to exec the command.
+func (sh *Cmd) CustomShell(shellName, execArg string) {
 	sh.RunWithShell(true)
 	sh.Shell.CustomSh.Enabled = true
-	sh.Shell.CustomSh.ShArg = Exec_Arg
-	sh.Shell.CustomSh.ShName = Shell_Name
+	sh.Shell.CustomSh.ShArg = execArg
+	sh.Shell.CustomSh.ShName = shellName
 }
 
 func (sh *Cmd) UseBashShell(set bool) {
 	sh.RunWithShell(true)
-	sh.Shell.bash = true
+	sh.Shell.bash = set
 }
 
 // Internal funcions
@@ -98,7 +98,6 @@ func (sh Cmd) getExec() *exec.Cmd {
 			Chroot: sh.Chroot.Route,
 		}
 		return cmd
-
 	}
 
 	if sh.Shell.Enabled {
@@ -119,21 +118,22 @@ func (sh Cmd) getExec() *exec.Cmd {
 
 // normal running funcions
 
-// Executes normally the command with the parameters set, with the classic exec.Command(<command>).Run()
+// Executes normally the command with the parameters set, with the classic exec.Command(<command>).Run().
 func (sh *Cmd) Run() error {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
 	return cmd.Run()
 }
 
-// It is the same as run, but skips the Std setting and returns an error value and the output as a string, i.e. exec.Command(<command>).Output()
+// It is the same as run, but skips the Std setting and returns an error value and the output as a string,
+// i.e. exec.Command(<command>).Output().
 func (sh Cmd) Out() (string, error) {
 	cmd := sh.getExec()
 	out, err := cmd.Output()
 	return string(out), err
 }
 
-// It is the same as run, but returns one more string value (the output of the command)
+// It is the same as run, but returns one more string value (the output of the command).
 func (sh Cmd) CombinedOut() (string, error) {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
@@ -141,14 +141,14 @@ func (sh Cmd) CombinedOut() (string, error) {
 	return string(out), err
 }
 
-// Run the command in a new goroutine, just like cmd.Run(), but using exec.Command(<cmd>).Start()
+// Run the command in a new goroutine, just like cmd.Run(), but using exec.Command(<cmd>).Start().
 func (sh Cmd) Start() error {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
 	return cmd.Start()
 }
 
-// Returns the exec.Cmd structure with all parameters already configured
+// Returns the exec.Cmd structure with all parameters already configured.
 func (sh Cmd) GetExec() *exec.Cmd {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)

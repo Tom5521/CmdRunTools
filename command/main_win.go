@@ -27,7 +27,7 @@ type Cmd struct {
 
 // Init
 
-// Initializes a new instance of the command, already setting the command to run
+// Initializes a new instance of the command, already setting the command to run.
 func InitCmd(input string) Cmd {
 	sh := Cmd{}
 	sh.SetInput(input)
@@ -40,7 +40,7 @@ func InitCmdf(input string, args ...any) Cmd {
 
 // Global config parameters
 
-// Run the command using "powershell.exe [parameters] /c [command]" instead of "cmd.exe [parameters] /c [command]"
+// Run the command using "powershell.exe [parameters] /c [command]" instead of "cmd.exe [parameters] /c [command]".
 func (sh *Cmd) RunWithPS(set bool) {
 	sh.Powershell.Enabled = set
 }
@@ -55,7 +55,7 @@ func (sh *Cmd) HideCmdWindow(set bool) {
 	sh.Cmd.HideCmdWindow = set
 }
 
-// Set custom Stdin,Stdout,Stderr in one function
+// Set custom Stdin,Stdout,Stderr in one function.
 func (sh *Cmd) CustomStd(Stdin, Stdout, Stderr bool) {
 	sh.CStd.Enabled = true
 	sh.CStd.Stderr = Stderr
@@ -63,19 +63,19 @@ func (sh *Cmd) CustomStd(Stdin, Stdout, Stderr bool) {
 	sh.CStd.Stdout = Stdout
 }
 
-// Set the individual Stdin
+// Set the individual Stdin.
 func (sh *Cmd) Stdin(set bool) {
 	sh.CStd.Enabled = true
 	sh.CStd.Stdin = set
 }
 
-// Set the individual Stdout
+// Set the individual Stdout.
 func (sh *Cmd) Stdout(set bool) {
 	sh.CStd.Enabled = true
 	sh.CStd.Stdout = set
 }
 
-// Set the individual Stderr
+// Set the individual Stderr.
 func (sh *Cmd) Stderr(set bool) {
 	sh.CStd.Enabled = true
 	sh.CStd.Stderr = set
@@ -114,17 +114,17 @@ func (sh Cmd) getExec() *exec.Cmd {
 
 // Running functions
 
-// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Run()" and return its error output
+// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Run()" and return its error output.
 func (sh Cmd) Run() error {
 	return sh.getFinal().Run()
 }
 
-// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Start()" and return its error output
+// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Start()" and return its error output.
 func (sh Cmd) Start() error {
 	return sh.getFinal().Run()
 }
 
-// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Output()" and return its string and error output
+// Execute the command with all the parameters already set, something like "exec.Command([formatted command]).Output()" and return its string and error output.
 func (sh Cmd) Out() (string, error) {
 	cmd := sh.getExec()
 	out, err := cmd.Output()
@@ -137,7 +137,7 @@ func (sh Cmd) CombinedOut() (string, error) {
 	return string(out), err
 }
 
-// Returns the exec.Cmd structure with all parameters already configured
+// Returns the exec.Cmd structure with all parameters already configured.
 func (sh Cmd) GetExec() *exec.Cmd {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)

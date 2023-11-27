@@ -1,7 +1,7 @@
 //go:build unix
 // +build unix
 
-package command
+package command_test
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"github.com/Tom5521/CmdRunTools/command"
 )
 
-var conf = getTestConf()
+var Conf = getTestConf()
 
 type jsondata struct {
 	Passwd        string `json:"password"`
@@ -21,8 +21,8 @@ type jsondata struct {
 }
 
 func WriteLog(data ...any) {
-	Strdata := fmt.Sprint(data...)
-	os.WriteFile("out.log", []byte(Strdata), os.ModePerm)
+	strdata := fmt.Sprint(data...)
+	os.WriteFile("out.log", []byte(strdata), os.ModePerm)
 }
 
 func getTestConf() jsondata {
@@ -39,21 +39,21 @@ func getTestConf() jsondata {
 }
 
 func Test_Sudo(t *testing.T) {
-	if conf.Passwd == "" {
+	if Conf.Passwd == "" {
 		t.Log("Passwd is <nil>")
 		t.Fatal()
 	}
-	var LogOut string
-	defer WriteLog(LogOut)
-	t.Log(conf.Passwd)
+	var logOut string
+	defer WriteLog(logOut)
+	t.Log(Conf.Passwd)
 	ls := func() {
 		cmd := command.InitCmd("ls /")
 		out, _ := cmd.Out()
 		t.Log(out)
-		LogOut = fmt.Sprintf("%v\n%v", LogOut, out)
+		logOut = fmt.Sprintf("%v\n%v", logOut, out)
 	}
 	file := "/asdadass"
-	cmd := command.Sudo_Cmd("mkdir "+file, conf.Passwd)
+	cmd := command.Sudo_Cmd("mkdir "+file, Conf.Passwd)
 	err := cmd.Run()
 	ls()
 	_, checkfile := os.Stat(file)
@@ -65,7 +65,7 @@ func Test_Sudo(t *testing.T) {
 	ls()
 
 	if err1 != nil || err != nil {
-		LogOut += "\n" + err1.Error()
+		logOut += "\n" + err1.Error()
 		t.Fail()
 	}
 }
@@ -73,11 +73,11 @@ func Test_CmdLib(t *testing.T) {
 	cmd := command.InitCmd("ls /")
 	cmd.UseBashShell(true)
 	out, err := cmd.Out()
-	t.Log(string(out))
+	t.Log(out)
 	if err != nil {
 		t.Fail()
 	}
-	//cmd.Stdout(true)
+	// cmd.Stdout(true)
 	out, err = cmd.SetAndCombinedOut("ls")
 	WriteLog(out)
 	if err != nil {
@@ -101,13 +101,13 @@ func Test_SetAnd(t *testing.T) {
 	cmd.SetAndRun("rmdir test")
 }
 
-// I test this in a virtual machine
+// I test this in a virtual machine.
 func Test_Chroot(t *testing.T) {
-	cmd := command.InitCmd(conf.ChrootCommand)
-	cmd.SetChroot(conf.ChrootDir)
+	cmd := command.InitCmd(Conf.ChrootCommand)
+	cmd.SetChroot(Conf.ChrootDir)
 	t.Log(cmd.Chroot)
 	t.Log(cmd.GetExec())
-	//cmd.CustomStd(true, true, true)
+	// cmd.CustomStd(true, true, true)
 	out, err := cmd.Out()
 	WriteLog(out)
 	if err != nil {
@@ -121,7 +121,7 @@ func Test_Chroot(t *testing.T) {
 	t.Log(string(outLog))
 }
 
-func Test_SetCstd(t *testing.T) {
+func Test_SetCstd(*testing.T) {
 	cmd := command.InitCmd("ls")
 	cmd.CustomStd(true, true, true)
 	cmd.Run()

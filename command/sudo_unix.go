@@ -20,7 +20,7 @@ type SudoCmd struct {
 	}
 }
 
-// Runs a command as sudo
+// Runs a command as sudo.
 func Sudo_Cmd(command string, optional_password ...string) SudoCmd {
 	sudoSh := SudoCmd{}
 	sudoSh.Input = command
@@ -30,7 +30,7 @@ func Sudo_Cmd(command string, optional_password ...string) SudoCmd {
 	return sudoSh
 }
 
-// Sudo parameters
+// Sudo parameters.
 func (sh *SudoCmd) SetSudoPasswd(password string) {
 	sh.sudo_pars.getted = true
 	sh.sudo_pars.Passwd = password
@@ -57,12 +57,17 @@ func (sh SudoCmd) getExec() *exec.Cmd {
 	return cmd
 }
 
-func (sh SudoCmd) writePasswd(cmd *exec.Cmd) {
+func (sh SudoCmd) writePasswd(cmd *exec.Cmd) error {
 	stdin, _ := cmd.StdinPipe()
+	var reterr error
 	go func() {
 		defer stdin.Close()
-		io.WriteString(stdin, sh.sudo_pars.Passwd)
+		_, err := io.WriteString(stdin, sh.sudo_pars.Passwd)
+		if err != nil {
+			reterr = err
+		}
 	}()
+	return reterr
 }
 
 // sudo running funcions
@@ -70,13 +75,19 @@ func (sh SudoCmd) writePasswd(cmd *exec.Cmd) {
 func (sh SudoCmd) Run() error {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
-	sh.writePasswd(cmd)
+	err := sh.writePasswd(cmd)
+	if err != nil {
+		return err
+	}
 	return cmd.Run()
 }
 
 func (sh SudoCmd) Out() (string, error) {
 	cmd := sh.getExec()
-	sh.writePasswd(cmd)
+	err := sh.writePasswd(cmd)
+	if err != nil {
+		return "", err
+	}
 	out, err := cmd.Output()
 	return string(out), err
 }
@@ -84,7 +95,10 @@ func (sh SudoCmd) Out() (string, error) {
 func (sh SudoCmd) CombinedOut() (string, error) {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
-	sh.writePasswd(cmd)
+	err := sh.writePasswd(cmd)
+	if err != nil {
+		return "", err
+	}
 	out, err := cmd.CombinedOutput()
 	return string(out), err
 }
@@ -92,6 +106,9 @@ func (sh SudoCmd) CombinedOut() (string, error) {
 func (sh SudoCmd) Start() error {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
-	sh.writePasswd(cmd)
+	err := sh.writePasswd(cmd)
+	if err != nil {
+		return err
+	}
 	return cmd.Start()
 }
