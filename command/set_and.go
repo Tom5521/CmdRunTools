@@ -1,11 +1,6 @@
-//go:build unix
-// +build unix
-
 package command
 
 import "fmt"
-
-// Set and... functions
 
 // It is the same as cmd := command.Cmd("<command>"); cmd.Run() but in a single argument,
 // what it does is to put an internal input (the one provided)

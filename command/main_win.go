@@ -28,14 +28,14 @@ type Cmd struct {
 // Init
 
 // Initializes a new instance of the command, already setting the command to run.
-func InitCmd(input string) Cmd {
-	sh := Cmd{}
+func NewCmd(input string) WindowsCmd {
+	sh := &Cmd{}
 	sh.SetInput(input)
 	return sh
 }
 
-func InitCmdf(input string, args ...any) Cmd {
-	return InitCmd(fmt.Sprintf(input, args...))
+func NewCmdf(input string, args ...any) WindowsCmd {
+	return NewCmd(fmt.Sprintf(input, args...))
 }
 
 // Global config parameters
@@ -55,30 +55,22 @@ func (sh *Cmd) HideCmdWindow(set bool) {
 	sh.Cmd.HideCmdWindow = set
 }
 
-// Set custom Stdin,Stdout,Stderr in one function.
-func (sh *Cmd) CustomStd(Stdin, Stdout, Stderr bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stderr = Stderr
-	sh.CStd.Stdin = Stdin
-	sh.CStd.Stdout = Stdout
+// It sets the customized powershell flags, its syntax when executed would be something like this "powershell.exe [flags] /c [command]".
+func (sh *Cmd) CustomPSFlags(flags string) {
+	sh.Powershell.PSFlags = flags
 }
 
-// Set the individual Stdin.
-func (sh *Cmd) Stdin(set bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stdin = set
+func (sh *Cmd) CustomPSFlagsf(flags string, args ...any) {
+	sh.Powershell.PSFlags = fmt.Sprintf(flags, args...)
 }
 
-// Set the individual Stdout.
-func (sh *Cmd) Stdout(set bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stdout = set
+// It sets the customized cmd flags, its syntax when executed would be something like this "cmd.exe [flags] /c [command]".
+func (sh *Cmd) CustomCmdFlags(flags string) {
+	sh.Cmd.CmdFlags = flags
 }
 
-// Set the individual Stderr.
-func (sh *Cmd) Stderr(set bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stderr = set
+func (sh *Cmd) CustomCmdFlagsf(flags string, args ...any) {
+	sh.Cmd.CmdFlags = fmt.Sprintf(flags, args...)
 }
 
 // Internal functions

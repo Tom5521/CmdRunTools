@@ -43,6 +43,32 @@ func (sh *Shared) SetPathf(path string, args ...any) {
 	sh.Path = pathset
 }
 
+// Set custom Stdin,Stdout,Stderr in one function.
+func (sh *Shared) Std(Stdin, Stdout, Stderr bool) {
+	sh.CStd.Enabled = true
+	sh.CStd.Stderr = Stderr
+	sh.CStd.Stdin = Stdin
+	sh.CStd.Stdout = Stdout
+}
+
+// Set the individual Stdin.
+func (sh *Shared) Stdin(set bool) {
+	sh.CStd.Enabled = true
+	sh.CStd.Stdin = set
+}
+
+// Set the individual Stdout.
+func (sh *Shared) Stdout(set bool) {
+	sh.CStd.Enabled = true
+	sh.CStd.Stdout = set
+}
+
+// Set the individual Stderr.
+func (sh *Shared) Stderr(set bool) {
+	sh.CStd.Enabled = true
+	sh.CStd.Stderr = set
+}
+
 func SetStd(sh Shared, cmd *exec.Cmd) {
 	if !sh.CStd.Enabled {
 		return

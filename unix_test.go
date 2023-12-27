@@ -47,13 +47,13 @@ func Test_Sudo(t *testing.T) {
 	defer WriteLog(logOut)
 	t.Log(Conf.Passwd)
 	ls := func() {
-		cmd := command.InitCmd("ls /")
+		cmd := command.NewCmd("ls /")
 		out, _ := cmd.Out()
 		t.Log(out)
 		logOut = fmt.Sprintf("%v\n%v", logOut, out)
 	}
 	file := "/asdadass"
-	cmd := command.Sudo_Cmd("mkdir "+file, Conf.Passwd)
+	cmd := command.NewSudoCmd("mkdir "+file, Conf.Passwd)
 	err := cmd.Run()
 	ls()
 	_, checkfile := os.Stat(file)
@@ -70,7 +70,7 @@ func Test_Sudo(t *testing.T) {
 	}
 }
 func Test_CmdLib(t *testing.T) {
-	cmd := command.InitCmd("ls /")
+	cmd := command.NewCmd("ls /")
 	cmd.UseBashShell(true)
 	out, err := cmd.Out()
 	t.Log(out)
@@ -103,9 +103,9 @@ func Test_SetAnd(t *testing.T) {
 
 // I test this in a virtual machine.
 func Test_Chroot(t *testing.T) {
-	cmd := command.InitCmd(Conf.ChrootCommand)
+	cmd := command.NewCmd(Conf.ChrootCommand)
 	cmd.SetChroot(Conf.ChrootDir)
-	t.Log(cmd.Chroot)
+	t.Log(cmd.GetChroot())
 	t.Log(cmd.GetExec())
 	// cmd.CustomStd(true, true, true)
 	out, err := cmd.Out()
@@ -122,7 +122,7 @@ func Test_Chroot(t *testing.T) {
 }
 
 func Test_SetCstd(*testing.T) {
-	cmd := command.InitCmd("ls")
-	cmd.CustomStd(true, true, true)
+	cmd := command.NewCmd("ls")
+	cmd.Std(true, true, true)
 	cmd.Run()
 }

@@ -21,13 +21,16 @@ type SudoCmd struct {
 }
 
 // Runs a command as sudo.
-func Sudo_Cmd(command string, optional_password ...string) SudoCmd {
-	sudoSh := SudoCmd{}
+func NewSudoCmd(command string, optional_password ...string) UnixCmd {
+	sudoSh := &SudoCmd{}
 	sudoSh.Input = command
 	if len(optional_password) > 0 {
 		sudoSh.SetSudoPasswd(optional_password[0])
 	}
 	return sudoSh
+}
+func NewSudoCmdf(passwd, command string, args ...any) UnixCmd {
+	return NewSudoCmd(fmt.Sprintf(command, args...), passwd)
 }
 
 // Sudo parameters.
@@ -72,7 +75,7 @@ func (sh SudoCmd) writePasswd(cmd *exec.Cmd) error {
 
 // sudo running funcions
 
-func (sh SudoCmd) Run() error {
+func (sh *SudoCmd) Run() error {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
 	err := sh.writePasswd(cmd)

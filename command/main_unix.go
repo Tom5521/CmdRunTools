@@ -33,40 +33,20 @@ type Cmd struct {
 // Init functions
 
 // Creates a Cmd structure.
-func InitCmd(command string) Cmd {
-	sh := Cmd{}
+func NewCmd(command string) UnixCmd {
+	sh := &Cmd{}
 	sh.Input = command
 	return sh
 }
 
 // It's the same as InitCmd(fmt.Sprintf(command,args...)).
-func InitCmdf(command string, args ...any) Cmd {
-	return InitCmd(fmt.Sprintf(command, args...))
+func NewCmdf(command string, args ...any) UnixCmd {
+	return NewCmd(fmt.Sprintf(command, args...))
 }
 
 // If the value is true use exec.Command([shell],[arg],input) instead of exec.Command(input[0],input[1:]...)
 func (sh *Cmd) RunWithShell(set bool) {
 	sh.Shell.Enabled = set
-}
-
-// Set a custom stdin,stdout or stderr. Default std is all in false.
-func (sh *Cmd) CustomStd(stdin, stdout, stderr bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stderr = stderr
-	sh.CStd.Stdout = stdout
-	sh.CStd.Stdin = stdin
-}
-func (sh *Cmd) Stdin(set bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stdin = set
-}
-func (sh *Cmd) Stderr(set bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stderr = set
-}
-func (sh *Cmd) Stdout(set bool) {
-	sh.CStd.Enabled = true
-	sh.CStd.Stdout = set
 }
 
 // Set a custom shell to exec the command.
@@ -80,6 +60,20 @@ func (sh *Cmd) CustomShell(shellName, execArg string) {
 func (sh *Cmd) UseBashShell(set bool) {
 	sh.RunWithShell(true)
 	sh.Shell.bash = set
+}
+
+func (sh *Cmd) GetChroot() (string, bool) {
+	return sh.Chroot.Route, sh.Chroot.Enabled
+}
+
+func (sh *Cmd) SetChroot(mountPoint string) {
+	sh.Chroot.Enabled = true
+	sh.Chroot.Route = mountPoint
+}
+
+func (sh *Cmd) SetChrootf(mountPoint string, args ...any) {
+	sh.Chroot.Enabled = true
+	sh.Chroot.Route = fmt.Sprintf(mountPoint, args...)
 }
 
 // Internal funcions
@@ -119,7 +113,7 @@ func (sh Cmd) getExec() *exec.Cmd {
 // normal running funcions
 
 // Executes normally the command with the parameters set, with the classic exec.Command(<command>).Run().
-func (sh *Cmd) Run() error {
+func (sh Cmd) Run() error {
 	cmd := sh.getExec()
 	internal.SetStd(sh.Shared, cmd)
 	return cmd.Run()
