@@ -14,7 +14,7 @@ import (
 
 type SudoCmd struct {
 	Cmd
-	sudo_pars struct {
+	sudoPars struct {
 		getted bool
 		Passwd string
 	}
@@ -22,8 +22,8 @@ type SudoCmd struct {
 
 // Sudo parameters.
 func (sh *SudoCmd) SetPasswd(password string) {
-	sh.sudo_pars.getted = true
-	sh.sudo_pars.Passwd = password
+	sh.sudoPars.getted = true
+	sh.sudoPars.Passwd = password
 }
 
 // Internal sudo functions
@@ -52,7 +52,7 @@ func (sh SudoCmd) writePasswd(cmd *exec.Cmd) error {
 	var reterr error
 	go func() {
 		defer stdin.Close()
-		_, err := io.WriteString(stdin, sh.sudo_pars.Passwd)
+		_, err := io.WriteString(stdin, sh.sudoPars.Passwd)
 		if err != nil {
 			reterr = err
 		}
