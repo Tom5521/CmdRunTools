@@ -2,6 +2,8 @@ package command
 
 import "os/exec"
 
+// The universal base interface for the others,
+// can be converted unidirectionally to all others.
 type BaseCmd interface {
 	GetExec() *exec.Cmd
 
@@ -37,6 +39,8 @@ type BaseCmd interface {
 	SetAndRun(string) error
 }
 
+// The exclusive command interface for windows,
+// you can convert BaseCmd -> WindowsCmd with specific functions for that OS.
 type WindowsCmd interface {
 	BaseCmd
 
@@ -53,6 +57,8 @@ type WindowsCmd interface {
 	CustomCmdFlagsf(string, ...any)
 }
 
+// An exclusive interface for unix,
+// which has the specific functions for that OS.
 type UnixCmd interface {
 	BaseCmd
 
@@ -64,4 +70,13 @@ type UnixCmd interface {
 	GetChroot() (string, bool)
 	SetChroot(string)
 	SetChrootf(string, ...any)
+	EnableChroot()
+	DisableChroot()
+}
+
+// Unix interface with extra functions to cover sudo execution.
+type UnixSudoCmd interface {
+	UnixCmd
+
+	SetPasswd(string)
 }

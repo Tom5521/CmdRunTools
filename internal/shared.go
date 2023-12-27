@@ -44,11 +44,11 @@ func (sh *Shared) SetPathf(path string, args ...any) {
 }
 
 // Set custom Stdin,Stdout,Stderr in one function.
-func (sh *Shared) Std(Stdin, Stdout, Stderr bool) {
+func (sh *Shared) Std(stdin, stdout, stderr bool) {
 	sh.CStd.Enabled = true
-	sh.CStd.Stderr = Stderr
-	sh.CStd.Stdin = Stdin
-	sh.CStd.Stdout = Stdout
+	sh.CStd.Stderr = stderr
+	sh.CStd.Stdin = stdin
+	sh.CStd.Stdout = stdout
 }
 
 // Set the individual Stdin.

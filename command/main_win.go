@@ -25,19 +25,6 @@ type Cmd struct {
 	}
 }
 
-// Init
-
-// Initializes a new instance of the command, already setting the command to run.
-func NewCmd(input string) WindowsCmd {
-	sh := &Cmd{}
-	sh.SetInput(input)
-	return sh
-}
-
-func NewCmdf(input string, args ...any) WindowsCmd {
-	return NewCmd(fmt.Sprintf(input, args...))
-}
-
 // Global config parameters
 
 // Run the command using "powershell.exe [parameters] /c [command]" instead of "cmd.exe [parameters] /c [command]".

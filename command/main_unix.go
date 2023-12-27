@@ -12,7 +12,6 @@ import (
 	"github.com/Tom5521/CmdRunTools/internal"
 )
 
-// global struct.
 type Cmd struct {
 	internal.Shared
 	Shell struct {
@@ -28,20 +27,6 @@ type Cmd struct {
 		Route   string
 		Enabled bool
 	}
-}
-
-// Init functions
-
-// Creates a Cmd structure.
-func NewCmd(command string) UnixCmd {
-	sh := &Cmd{}
-	sh.Input = command
-	return sh
-}
-
-// It's the same as InitCmd(fmt.Sprintf(command,args...)).
-func NewCmdf(command string, args ...any) UnixCmd {
-	return NewCmd(fmt.Sprintf(command, args...))
 }
 
 // If the value is true use exec.Command([shell],[arg],input) instead of exec.Command(input[0],input[1:]...)
@@ -62,15 +47,28 @@ func (sh *Cmd) UseBashShell(set bool) {
 	sh.Shell.bash = set
 }
 
+// Returns whether chroot is enabled and its respective path.
 func (sh *Cmd) GetChroot() (string, bool) {
 	return sh.Chroot.Route, sh.Chroot.Enabled
 }
 
+// Configure the Chroot path and activate it.
 func (sh *Cmd) SetChroot(mountPoint string) {
 	sh.Chroot.Enabled = true
 	sh.Chroot.Route = mountPoint
 }
 
+// Enables Chroot.
+func (sh *Cmd) EnableChroot() {
+	sh.Chroot.Enabled = true
+}
+
+// Disables Chroot.
+func (sh *Cmd) DisableChroot() {
+	sh.Chroot.Enabled = false
+}
+
+// Same as SetChroot but with a fmt.Sprinf inside it.
 func (sh *Cmd) SetChrootf(mountPoint string, args ...any) {
 	sh.Chroot.Enabled = true
 	sh.Chroot.Route = fmt.Sprintf(mountPoint, args...)

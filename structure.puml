@@ -1,5 +1,27 @@
 @startuml
 namespace command {
+    interface BaseCmd  {
+        + GetExec() *exec.Cmd
+        + SetInput( string) 
+        + SetInputf( string,  ...any) 
+        + Std( bool,  bool,  bool) 
+        + Stdout( bool) 
+        + Stdin( bool) 
+        + Stderr( bool) 
+        + Run() error
+        + Out() (string, error)
+        + Start() error
+        + CombinedOut() (string, error)
+        + SetAndStartf( string,  ...any) error
+        + SetAndCombinedOutf( string,  ...any) (string, error)
+        + SetAndOutf( string,  ...any) (string, error)
+        + SetAndRunf( string,  ...any) error
+        + SetAndStart( string) error
+        + SetAndCombinedOut( string) (string, error)
+        + SetAndOut( string) (string, error)
+        + SetAndRun( string) error
+
+    }
     class Cmd << (S,Aquamarine) >> {
         + Shell <font color=blue>struct</font>{bool, bool, <font color=blue>struct</font>{bool, string, string}}
         + Chroot <font color=blue>struct</font>{string, bool}
@@ -11,19 +33,14 @@ namespace command {
         - formatcmd() string
         - getExec() *exec.Cmd
 
-        + SetChroot(mountPoint string) 
-        + SetChrootf(mountPoint string, args ...any) 
-        + CustomPSFlags(flags string) 
-        + CustomPSFlagsf(flags string, args ...any) 
-        + CustomCmdFlags(flags string) 
-        + CustomCmdFlagsf(flags string, args ...any) 
         + RunWithShell(set bool) 
-        + CustomStd(Stdin bool, Stdout bool, Stderr bool) 
-        + Stdin(set bool) 
-        + Stderr(set bool) 
-        + Stdout(set bool) 
-        + CustomShell(Shell_Name string, Exec_Arg string) 
+        + CustomShell(shellName string, execArg string) 
         + UseBashShell(set bool) 
+        + GetChroot() (string, bool)
+        + SetChroot(mountPoint string) 
+        + EnableChroot() 
+        + DisableChroot() 
+        + SetChrootf(mountPoint string, args ...any) 
         + Run() error
         + Out() (string, error)
         + CombinedOut() (string, error)
@@ -32,10 +49,10 @@ namespace command {
         + RunWithPS(set bool) 
         + RunWithoutCmd(set bool) 
         + HideCmdWindow(set bool) 
-        + CustomStd(Stdin bool, Stdout bool, Stderr bool) 
-        + Stdin(set bool) 
-        + Stdout(set bool) 
-        + Stderr(set bool) 
+        + CustomPSFlags(flags string) 
+        + CustomPSFlagsf(flags string, args ...any) 
+        + CustomCmdFlags(flags string) 
+        + CustomCmdFlagsf(flags string, args ...any) 
         + Run() error
         + Start() error
         + Out() (string, error)
@@ -49,33 +66,57 @@ namespace command {
         + SetAndOutf(command string, args ...any) (string, error)
         + SetAndCombinedOutf(command string, args ...any) (string, error)
         + SetAndStartf(command string, args ...any) error
-        + SetAndRun(command string) error
-        + SetAndRunf(command string, args ...any) error
-        + SetAndOut(command string) (string, error)
-        + SetAndOutf(command string, args ...any) (string, error)
-        + SetAndStart(command string) error
-        + SetAndStartf(command string, args ...any) error
-        + SetAndCombinedOut(command string) (string, error)
-        + SetAndCombinedOutf(command string, args ...any) (string, error)
 
     }
     class SudoCmd << (S,Aquamarine) >> {
         - sudo_pars <font color=blue>struct</font>{bool, string}
 
         - getExec() *exec.Cmd
-        - writePasswd(cmd *exec.Cmd) 
+        - writePasswd(cmd *exec.Cmd) error
 
-        + SetSudoPasswd(password string) 
+        + SetPasswd(password string) 
+        + GetExec() *exec.Cmd
         + Run() error
         + Out() (string, error)
         + CombinedOut() (string, error)
         + Start() error
 
     }
+    interface UnixCmd  {
+        + RunWithShell( bool) 
+        + UseBashShell( bool) 
+        + CustomShell( string,  string) 
+        + GetChroot() (string, bool)
+        + SetChroot( string) 
+        + SetChrootf( string,  ...any) 
+        + EnableChroot() 
+        + DisableChroot() 
+
+    }
+    interface UnixSudoCmd  {
+        + SetPasswd( string) 
+
+    }
+    interface WindowsCmd  {
+        + RunWithPS( bool) 
+        + RunWithoutCmd( bool) 
+        + HideCmdWindow( bool) 
+        + CustomPSFlags( string) 
+        + CustomPSFlagsf( string,  ...any) 
+        + CustomCmdFlags( string) 
+        + CustomCmdFlagsf( string,  ...any) 
+
+    }
 }
 "internal.Shared" *-- "command.Cmd"
 "command.Cmd" *-- "command.SudoCmd"
+"command.BaseCmd" *-- "command.UnixCmd"
+"command.UnixCmd" *-- "command.UnixSudoCmd"
+"command.BaseCmd" *-- "command.WindowsCmd"
 
+"command.UnixCmd" <|-- "command.Cmd"
+"command.WindowsCmd" <|-- "command.Cmd"
+"command.UnixSudoCmd" <|-- "command.SudoCmd"
 
 namespace internal {
     class Shared << (S,Aquamarine) >> {
@@ -88,6 +129,10 @@ namespace internal {
         + SetInputf(input string, args ...any) 
         + SetPath(path string) 
         + SetPathf(path string, args ...any) 
+        + Std(stdin bool, stdout bool, stderr bool) 
+        + Stdin(set bool) 
+        + Stdout(set bool) 
+        + Stderr(set bool) 
 
     }
 }

@@ -18,7 +18,7 @@ func WriteToLog(data ...any) {
 }
 
 func Test_PS(t *testing.T) {
-	cmd := command.InitCmd("ls")
+	cmd := command.NewCmd("ls")
 	cmd.RunWithPS(true)
 	err := cmd.Run()
 	t.Log(cmd.GetExec().String())
@@ -30,7 +30,7 @@ func Test_PS(t *testing.T) {
 }
 
 func Test_Cmd(t *testing.T) {
-	cmd := command.InitCmd("dir")
+	cmd := command.NewCmd("dir")
 	out, err := cmd.CombinedOut()
 	WriteToLog(out)
 	if err != nil {
@@ -49,7 +49,7 @@ func Test_Cmd(t *testing.T) {
 
 func Test_ChangeInput(t *testing.T) {
 	assert := assert.New(t)
-	cmd := command.InitCmd("dir")
+	cmd := command.NewCmd("dir")
 	original := cmd.Input
 	fmt.Println(cmd.Input)
 	cmd.SetInput("Hola mundo")
