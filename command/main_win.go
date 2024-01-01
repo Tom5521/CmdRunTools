@@ -20,7 +20,7 @@ type Cmd struct {
 	}
 	Cmd struct {
 		CmdFlags      string
-		RunWithoutCmd bool
+		RawExec       bool
 		HideCmdWindow bool
 	}
 }
@@ -31,33 +31,53 @@ type Cmd struct {
 func (sh *Cmd) RunWithPS(set bool) {
 	sh.Powershell.Enabled = set
 }
+func (sh *Cmd) UsingPS() bool {
+	return sh.Powershell.Enabled
+}
+func (sh *Cmd) UsingCmd() bool {
+	return !sh.Cmd.RawExec
+}
 
 // Execute the command directly, it is useful if you want to execute a binary, this mode does not have access to the path so you will have to put the full path of the binary or use something relative to execute it.
-func (sh *Cmd) RunWithoutCmd(set bool) {
-	sh.Cmd.RunWithoutCmd = set
+func (sh *Cmd) SetRawExec(set bool) {
+	sh.Cmd.RawExec = set
+}
+func (sh *Cmd) RawExec() bool {
+	return sh.Cmd.RawExec
 }
 
 // Hides the cmd/powershell window that appears when executing a command in go.
-func (sh *Cmd) HideCmdWindow(set bool) {
+func (sh *Cmd) SetHideCmd(set bool) {
 	sh.Cmd.HideCmdWindow = set
+}
+func (sh *Cmd) HideCmd() bool {
+	return sh.Cmd.HideCmdWindow
 }
 
 // It sets the customized powershell flags, its syntax when executed would be something like this "powershell.exe [flags] /c [command]".
-func (sh *Cmd) CustomPSFlags(flags string) {
+func (sh *Cmd) SetPSFlags(flags string) {
 	sh.Powershell.PSFlags = flags
 }
 
-func (sh *Cmd) CustomPSFlagsf(flags string, args ...any) {
+func (sh *Cmd) SetPSFlagsf(flags string, args ...any) {
 	sh.Powershell.PSFlags = fmt.Sprintf(flags, args...)
 }
 
 // It sets the customized cmd flags, its syntax when executed would be something like this "cmd.exe [flags] /c [command]".
-func (sh *Cmd) CustomCmdFlags(flags string) {
+func (sh *Cmd) SetCmdFlags(flags string) {
 	sh.Cmd.CmdFlags = flags
 }
 
-func (sh *Cmd) CustomCmdFlagsf(flags string, args ...any) {
+func (sh *Cmd) SetCmdFlagsf(flags string, args ...any) {
 	sh.Cmd.CmdFlags = fmt.Sprintf(flags, args...)
+}
+
+func (sh *Cmd) PSFlags() string {
+	return sh.Powershell.PSFlags
+}
+
+func (sh *Cmd) CmdFlags() string {
+	return sh.Cmd.CmdFlags
 }
 
 // Internal functions
@@ -72,7 +92,7 @@ func (sh Cmd) formatcmd() string {
 	var cmd string
 	if sh.Powershell.Enabled {
 		cmd = fmt.Sprintf("powershell.exe %v /c %v", sh.Powershell.PSFlags, sh.Input)
-	} else if !sh.Cmd.RunWithoutCmd {
+	} else if !sh.Cmd.RawExec {
 		cmd = fmt.Sprintf("cmd.exe %v /c %v", sh.Cmd.CmdFlags, sh.Input)
 	} else {
 		cmd = sh.Input

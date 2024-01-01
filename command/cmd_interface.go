@@ -47,14 +47,22 @@ type WindowsCmd interface {
 	// Configuration
 
 	RunWithPS(bool)
-	RunWithoutCmd(bool)
-	HideCmdWindow(bool)
 
-	CustomPSFlags(string)
-	CustomPSFlagsf(string, ...any)
+	SetRawExec(bool)
+	RawExec() bool
+	SetHideCmd(bool)
+	HideCmd() bool
 
-	CustomCmdFlags(string)
-	CustomCmdFlagsf(string, ...any)
+	UsingPS() bool
+	UsingCmd() bool
+
+	SetPSFlags(string)
+	SetPSFlagsf(string, ...any)
+	PSFlags() string
+
+	SetCmdFlags(string)
+	SetCmdFlagsf(string, ...any)
+	CmdFlags() string
 }
 
 // An exclusive interface for unix,
