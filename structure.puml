@@ -47,12 +47,18 @@ namespace command {
         + Start() error
         + GetExec() *exec.Cmd
         + RunWithPS(set bool) 
-        + RunWithoutCmd(set bool) 
-        + HideCmdWindow(set bool) 
-        + CustomPSFlags(flags string) 
-        + CustomPSFlagsf(flags string, args ...any) 
-        + CustomCmdFlags(flags string) 
-        + CustomCmdFlagsf(flags string, args ...any) 
+        + UsingPS() bool
+        + UsingCmd() bool
+        + SetRawExec(set bool) 
+        + RawExec() bool
+        + SetHideCmd(set bool) 
+        + HideCmd() bool
+        + SetPSFlags(flags string) 
+        + SetPSFlagsf(flags string, args ...any) 
+        + SetCmdFlags(flags string) 
+        + SetCmdFlagsf(flags string, args ...any) 
+        + PSFlags() string
+        + CmdFlags() string
         + Run() error
         + Start() error
         + Out() (string, error)
@@ -69,7 +75,7 @@ namespace command {
 
     }
     class SudoCmd << (S,Aquamarine) >> {
-        - sudo_pars <font color=blue>struct</font>{bool, string}
+        - sudoPars <font color=blue>struct</font>{bool, string}
 
         - getExec() *exec.Cmd
         - writePasswd(cmd *exec.Cmd) error
@@ -99,12 +105,18 @@ namespace command {
     }
     interface WindowsCmd  {
         + RunWithPS( bool) 
-        + RunWithoutCmd( bool) 
-        + HideCmdWindow( bool) 
-        + CustomPSFlags( string) 
-        + CustomPSFlagsf( string,  ...any) 
-        + CustomCmdFlags( string) 
-        + CustomCmdFlagsf( string,  ...any) 
+        + SetRawExec( bool) 
+        + RawExec() bool
+        + SetHideCmd( bool) 
+        + HideCmd() bool
+        + UsingPS() bool
+        + UsingCmd() bool
+        + SetPSFlags( string) 
+        + SetPSFlagsf( string,  ...any) 
+        + PSFlags() string
+        + SetCmdFlags( string) 
+        + SetCmdFlagsf( string,  ...any) 
+        + CmdFlags() string
 
     }
 }
